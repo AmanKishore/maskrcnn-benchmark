@@ -1,7 +1,7 @@
-ARG CUDA="9.0"
-ARG CUDNN="7"
+ARG CUDA="11.0"
+ARG CUDNN="8"
 
-FROM nvidia/cuda:${CUDA}-cudnn${CUDNN}-devel-ubuntu16.04
+FROM nvidia/cuda:${CUDA}-cudnn${CUDNN}-devel-ubuntu18.04
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
@@ -11,7 +11,7 @@ RUN apt-get update -y \
  && apt-get install -y libglib2.0-0 libsm6 libxext6 libxrender-dev
 
 # Install Miniconda
-RUN curl -so /miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+RUN curl -L -so /miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
  && chmod +x /miniconda.sh \
  && /miniconda.sh -b -p /miniconda \
  && rm /miniconda.sh
@@ -33,13 +33,12 @@ RUN pip install requests ninja yacs cython matplotlib opencv-python tqdm
 
 # Install PyTorch 1.0 Nightly
 ARG CUDA
-RUN conda install pytorch-nightly cudatoolkit=${CUDA} -c pytorch \
- && conda clean -ya
+RUN conda install pytorch torchvision torchaudio cudatoolkit=${CUDA} -c pytorch
 
 # Install TorchVision master
-RUN git clone https://github.com/pytorch/vision.git \
- && cd vision \
- && python setup.py install
+# RUN git clone https://github.com/pytorch/vision.git \
+#  && cd vision \
+#  && python setup.py install
 
 # install pycocotools
 RUN git clone https://github.com/cocodataset/cocoapi.git \

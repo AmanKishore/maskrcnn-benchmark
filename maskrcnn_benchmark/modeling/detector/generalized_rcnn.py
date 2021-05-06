@@ -12,6 +12,8 @@ from ..backbone import build_backbone
 from ..rpn.rpn import build_rpn
 from ..roi_heads.roi_heads import build_roi_heads
 
+from fDAL import fDALDivergenceHead
+
 
 class GeneralizedRCNN(nn.Module):
     """
@@ -48,7 +50,21 @@ class GeneralizedRCNN(nn.Module):
         images = to_image_list(images)
         features = self.backbone(images.tensors)
         proposals, proposal_losses = self.rpn(images, features, targets)
+        from maskrcnn_benchmark.config import cfg
         if self.roi_heads:
+            if hasattr(self, 'fdalhead') is False:
+                in_channels = cfg.MODEL.RESNETS.BACKBONE_OUT_CHANNELS  # this is specificied in the faster-cnn config.
+                
+                # Creating manually the auxiliary head. In this example the auxiliary head is a discriminator.
+                aux_head = nn.Sequential(
+                    nn.Conv2d(in_channels, 512, kernel_size=1, stride=1), nn.ReLU(),
+                    nn.Conv2d(512, 1, kernel_size=1, stride=1)
+                )
+                
+                # set the divergence (i.e pearson or jensen),pass the auxiliary head, set n_classes=-1 since we are ignoring class information in this example.
+                self.fdalhead = fDALDivergenceHead(divergence_name='pearson', aux_head=aux_head, n_classes=-1, reg_coef=0.1,
+                                                grl_params={'auto_step': True, 'hi': 1.0, 'max_iters': 10})
+
             x, result, detector_losses = self.roi_heads(features, proposals, targets)
         else:
             # RPN-only models don't have roi_heads
@@ -56,10 +72,16 @@ class GeneralizedRCNN(nn.Module):
             result = proposals
             detector_losses = {}
 
+        # features_s, features_t = features.chunk(2, dim=0)
+        print(len(features))
+        while True: continue
+        loss_fdal = self.fdalhead(features, None, None, None)
+
         if self.training:
             losses = {}
             losses.update(detector_losses)
             losses.update(proposal_losses)
+            losses.update({'fdal_loss': loss_fdal})
             return losses
 
         return result

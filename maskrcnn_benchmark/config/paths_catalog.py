@@ -7,6 +7,14 @@ from copy import deepcopy
 class DatasetCatalog(object):
     DATA_DIR = "datasets"
     DATASETS = {
+        "coco_nvidia_train" : {
+            "img_dir": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdata3/upload/up/coco_format/images",
+            "ann_file": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdata3/upload/up/coco_format/dataset-v9-fixed.json"
+        },
+        "coco_nvidia_test" : {
+            "img_dir": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdataKPI/up/coco_format/images/",
+            "ann_file" : "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdataKPI/up/coco_format/dataset-v9.json"
+        },
         "coco_2017_train": {
             "img_dir": "coco/train2017",
             "ann_file": "coco/annotations/instances_train2017.json"
@@ -179,6 +187,16 @@ class DatasetCatalog(object):
             attrs["img_dir"] = os.path.join(data_dir, attrs["img_dir"])
             attrs["ann_dir"] = os.path.join(data_dir, attrs["ann_dir"])
             return dict(factory="CityScapesDataset", args=attrs)
+        elif "nvidia" in name:
+            attrs = DatasetCatalog.DATASETS[name]
+            args = dict(
+                image_dir=os.path.abspath(attrs["image_dir"]),
+                dataset=os.path.abspath(attrs["dataset"]),
+            )
+            return dict(
+                factory="NVIDIADataset",
+                args=args,
+            )
         raise RuntimeError("Dataset not available: {}".format(name))
 
 
