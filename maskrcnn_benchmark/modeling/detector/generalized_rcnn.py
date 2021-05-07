@@ -72,9 +72,8 @@ class GeneralizedRCNN(nn.Module):
             result = proposals
             detector_losses = {}
 
-        # features_s, features_t = features.chunk(2, dim=0)
         print(len(features))
-        while True: continue
+        features_s, features_t = features.chunk(2, dim=0)
         loss_fdal = self.fdalhead(features, None, None, None)
 
         if self.training:
