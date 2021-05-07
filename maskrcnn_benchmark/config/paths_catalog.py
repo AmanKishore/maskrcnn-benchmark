@@ -11,6 +11,10 @@ class DatasetCatalog(object):
             "img_dir": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdata3/upload/up/coco_format/images",
             "ann_file": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdata3/upload/up/coco_format/dataset-v9-fixed.json"
         },
+        "coco_nvidia_real" : {
+            "img_dir": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdataKPI/up/coco_format/images/",
+            "ann_file" : "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdataKPI/up/coco_format/dataset-v9.json"
+        },
         "coco_nvidia_test" : {
             "img_dir": "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdataKPI/up/coco_format/images/",
             "ann_file" : "/home/scratch.nvdrivenet/amkishore/FrontSim_Data/drivesimdataKPI/up/coco_format/dataset-v9.json"

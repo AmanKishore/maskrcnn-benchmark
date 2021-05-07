@@ -22,7 +22,7 @@ MODEL:
     PREDICTOR: "FPNPredictor"
     NUM_CLASSES: 9
 DATASETS:
-  TRAIN: ("coco_nvidia_train",)
+  TRAIN: ("coco_nvidia_train", "coco_nvidia_real")
   TEST: ("coco_nvidia_test",)
 DATALOADER:
   SIZE_DIVISIBILITY: 32

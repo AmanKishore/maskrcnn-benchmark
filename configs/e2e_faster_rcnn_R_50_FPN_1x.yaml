@@ -21,7 +21,7 @@ MODEL:
     FEATURE_EXTRACTOR: "FPN2MLPFeatureExtractor"
     PREDICTOR: "FPNPredictor"
 DATASETS:
-  TRAIN: ("coco_nvidia_train", "coco_nvidia_train")
+  TRAIN: ("coco_nvidia_train", "coco_nvidia_real")
   TEST: ("coco_nvidia_test",)
 DATALOADER:
   SIZE_DIVISIBILITY: 32
