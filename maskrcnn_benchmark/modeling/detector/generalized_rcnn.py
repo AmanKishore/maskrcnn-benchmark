@@ -72,9 +72,13 @@ class GeneralizedRCNN(nn.Module):
             result = proposals
             detector_losses = {}
 
-        # print(len(features))
+        # print(len(features[0]))
+        # print(features[0])
+        n = len(features[0])
+        half = int(n/2) 
+        features_s, features_t = features[0][:half], features[0][n-half:]
         # features_s, features_t = features.chunk(2, dim=0)
-        loss_fdal = self.fdalhead(features[0], features[1], None, None)
+        loss_fdal = self.fdalhead(features_s, features_t, None, None)
 
         if self.training:
             losses = {}

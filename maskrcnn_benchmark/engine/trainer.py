@@ -43,7 +43,8 @@ def reduce_loss_dict(loss_dict):
 def do_train(
     cfg,
     model,
-    data_loader,
+    data_loader_src,
+    data_loader_trg,
     data_loader_val,
     optimizer,
     scheduler,
@@ -56,7 +57,7 @@ def do_train(
     logger = logging.getLogger("maskrcnn_benchmark.trainer")
     logger.info("Start training")
     meters = MetricLogger(delimiter="  ")
-    max_iter = len(data_loader)
+    max_iter = min(len(data_loader_src), len(data_loader_trg))
     start_iter = arguments["iteration"]
     model.train()
     start_training_time = time.time()
@@ -69,17 +70,36 @@ def do_train(
         iou_types = iou_types + ("keypoints",)
     dataset_names = cfg.DATASETS.TEST
 
-    for iteration, (images, targets, _) in enumerate(data_loader, start_iter):
-        
-        if any(len(target) < 1 for target in targets):
+    # for x in enumerate(zip(data_loader_src, data_loader_trg)):
+    #     print(x)
+    #     while True: continue
+
+    for iteration, ((images_src, targets_src, _), (images_trg, targets_trg, _)) in enumerate(zip(data_loader_src, data_loader_trg), start_iter):
+        # print(images_src, targets_src, images_trg, targets_trg)
+        if any(len(target) < 1 for target in targets_src):
+            logger.error(f"Iteration={iteration + 1} || Image Ids used for training {_} || targets Length={[len(target) for target in targets]}" )
+            continue
+        if any(len(target) < 1 for target in targets_trg):
             logger.error(f"Iteration={iteration + 1} || Image Ids used for training {_} || targets Length={[len(target) for target in targets]}" )
             continue
         data_time = time.time() - end
         iteration = iteration + 1
         arguments["iteration"] = iteration
 
+        # print(type(images_src))
+        # print(images_src.tensors)
+        # print(type(images_src.tensors))
+        images = torch.cat((images_src.tensors, images_trg.tensors),dim=0) 
+        # targets = torch.cat((targets_src.tensors, targets_trg.tensors), dim=0)
+        targets = targets_src + targets_trg
         images = images.to(device)
         targets = [target.to(device) for target in targets]
+        # images_src = images_src.to(device)
+        # targets_src = [target.to(device) for target in targets_src]
+
+        # images_trg = images_trg.to(device)
+        # targets_trg = [target.to(device) for target in targets_trg]
+
 
         loss_dict = model(images, targets)
 

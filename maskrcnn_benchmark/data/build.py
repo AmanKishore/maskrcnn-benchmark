@@ -105,7 +105,7 @@ def make_batch_data_sampler(
     return batch_sampler
 
 
-def make_data_loader(cfg, is_train=True, is_distributed=False, start_iter=0, is_for_period=False):
+def make_data_loader(cfg, is_source, is_train=True, is_distributed=False, start_iter=0, is_for_period=False):
     num_gpus = get_world_size()
     if is_train:
         images_per_batch = cfg.SOLVER.IMS_PER_BATCH
@@ -153,8 +153,12 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, start_iter=0, is_
 
     # If bbox aug is enabled in testing, simply set transforms to None and we will apply transforms later
     transforms = None if not is_train and cfg.TEST.BBOX_AUG.ENABLED else build_transforms(cfg, is_train)
-    datasets = build_dataset(dataset_list, transforms, DatasetCatalog, is_train or is_for_period)
-
+    if is_train and is_source:
+        datasets = build_dataset([str(dataset_list[0])], transforms, DatasetCatalog, is_train or is_for_period)
+    elif is_train and not is_source:
+        datasets = build_dataset([str(dataset_list[1])], transforms, DatasetCatalog, is_train or is_for_period)
+    else:
+        datasets = build_dataset(dataset_list, transforms, DatasetCatalog, is_train or is_for_period)
     if is_train:
         # save category_id to label name mapping
         save_labels(datasets, cfg.OUTPUT_DIR)

@@ -24,7 +24,7 @@ MODEL:
     FEATURE_EXTRACTOR: FBNet.roi_head
     NUM_CLASSES: 4
 DATASETS:
-  TRAIN: ("coco_nvidia_train",)
+  TRAIN: ("coco_nvidia_train", "coco_nvidia_real")
   TEST: ("coco_nvidia_test",)
 SOLVER:
   BASE_LR: 0.06
@@ -32,13 +32,13 @@ SOLVER:
   WEIGHT_DECAY: 0.0001
   STEPS: (60000, 80000)
   MAX_ITER: 90000
-  IMS_PER_BATCH: 32  # for 8GPUs
+  IMS_PER_BATCH: 16  # for 8GPUs
 # TEST:
 #   IMS_PER_BATCH: 8
 INPUT:
   MIN_SIZE_TRAIN: (320, )
-  MAX_SIZE_TRAIN: 640
+  MAX_SIZE_TRAIN: 1280
   MIN_SIZE_TEST: 320
-  MAX_SIZE_TEST: 640
+  MAX_SIZE_TEST: 1280
   PIXEL_MEAN: [103.53, 116.28, 123.675]
   PIXEL_STD: [57.375, 57.12, 58.395]

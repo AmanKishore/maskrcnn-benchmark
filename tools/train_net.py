@@ -75,8 +75,17 @@ def train(cfg, local_rank, distributed):
     extra_checkpoint_data = checkpointer.load(cfg.MODEL.WEIGHT)
     arguments.update(extra_checkpoint_data)
 
-    data_loader = make_data_loader(
+    data_loader_src = make_data_loader(
         cfg,
+        is_source=True,
+        is_train=True,
+        is_distributed=distributed,
+        start_iter=arguments["iteration"],
+    )
+
+    data_loader_trg = make_data_loader(
+        cfg,
+        is_source=False,
         is_train=True,
         is_distributed=distributed,
         start_iter=arguments["iteration"],
@@ -93,7 +102,8 @@ def train(cfg, local_rank, distributed):
     do_train(
         cfg,
         model,
-        data_loader,
+        data_loader_src,
+        data_loader_trg,
         data_loader_val,
         optimizer,
         scheduler,
